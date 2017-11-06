@@ -23,6 +23,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,15 +43,16 @@ public class MapsActivity extends AppCompatActivity
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnCameraIdleListener
+        GoogleMap.OnCameraIdleListener,
+        GoogleMap.OnInfoWindowClickListener
 {
   final int MY_LOCATION_REQUEST_CODE = 1;
 
-  final String API_KEY = "?api-key=rQ8lXW4lpLR9CwiYqK";
+  final String API_KEY = "api-key=rQ8lXW4lpLR9CwiYqK";
   final String BEGIN_URL = "https://api.winnipegtransit.com/v2/";
   final String JSON_APPEND = ".json";
   final String STATUS_SCHEDULE_REQUEST = "statuses/schedule";
-  final String STOP_SCHEDULE_REQUEST_BEGIN = "stops/";
+  final String STOP_SCHEDULE_REQUEST_BEGIN = "stops";
   final String STOP_SCHEDULE_REQUEST_END = "/schedule";
 
   private GoogleMap mMap;
@@ -100,7 +103,8 @@ public class MapsActivity extends AppCompatActivity
     {
       mMap.setMyLocationEnabled(true);
       mMap.setOnMyLocationButtonClickListener(this);
-      mMap.setOnCameraIdleListener((GoogleMap.OnCameraIdleListener) this);
+      mMap.setOnCameraIdleListener(this);
+      mMap.setOnInfoWindowClickListener(this);
     }
     else
     {
@@ -111,13 +115,28 @@ public class MapsActivity extends AppCompatActivity
   }
 
   @Override
+  public void onInfoWindowClick(Marker marker)
+  {
+    Toast.makeText(this,
+                    "This should open the stop schedule",
+                     Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
   public void onCameraIdle()
   {
     CameraPosition cameraPosition = mMap.getCameraPosition();
     LatLng cameraLatLng = cameraPosition.target;
 
-    Toast.makeText(this, cameraLatLng.latitude + " - " + cameraLatLng.longitude,
-            Toast.LENGTH_SHORT).show();
+    double lat = cameraLatLng.latitude;
+    double lon = cameraLatLng.longitude;
+
+    // URL to request the stops
+    // ttp://api.winnipegtransit.com/v2/stops.json?distance=500&lat=49.895&lon=-97.138&api-key=rQ8lXW4lpLR9CwiYqK
+    requestUrl = BEGIN_URL + STOP_SCHEDULE_REQUEST_BEGIN + JSON_APPEND
+            + "?distance=500" + "&lat=" + lat + "&lon=" + lon + "&" + API_KEY;
+
+    processRequest();
   }
 
   // Event Handler when the location button is clicked
@@ -199,14 +218,7 @@ public class MapsActivity extends AppCompatActivity
 
       LatLng currentLocation = new LatLng(lat, lon);
 
-      mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 17));
-
-      // URL to request the stops
-      // ttp://api.winnipegtransit.com/v2/stops.json?distance=500&lat=49.895&lon=-97.138&api-key=rQ8lXW4lpLR9CwiYqK
-      requestUrl = BEGIN_URL + STOP_SCHEDULE_REQUEST_BEGIN + JSON_APPEND
-                   + "?distance=500" + "&lat=" + lat + "&lon=" + lon + API_KEY;
-
-      processRequest();
+      mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16));
     }
   }
 
@@ -356,7 +368,19 @@ public class MapsActivity extends AppCompatActivity
     // Get the information from the status request
     private void extractStops(JSONArray stopsArray) throws JSONException
     {
-      //String message = statusObject.getString("message");
+      for (int i = 0; i < stopsArray.length(); i++)
+      {
+        JSONObject stopObj = (JSONObject)stopsArray.get(i);
+        String title = stopObj.getString("number") + ": " + stopObj.getString("name");
+
+        JSONObject geographicObj = stopObj.getJSONObject("centre").getJSONObject("geographic");
+        double latitude = geographicObj.getDouble("latitude");
+        double longitude = geographicObj.getDouble("longitude");
+
+        // Add a marker in each bus stop
+        LatLng busStop = new LatLng(latitude, longitude);
+        mMap.addMarker(new MarkerOptions().position(busStop).title(title));
+      }
     }
   }
 }
