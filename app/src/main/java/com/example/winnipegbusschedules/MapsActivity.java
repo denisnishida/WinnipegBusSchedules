@@ -374,6 +374,7 @@ public class MapsActivity extends AppCompatActivity
         JSONObject stopObj = (JSONObject)stopsArray.get(i);
         String snippet = stopObj.getString("name");
         clickedStopNumber = stopObj.getString("number");
+        String title = "Stop Number: " + clickedStopNumber;
 
         JSONObject geographicObj = stopObj.getJSONObject("centre").getJSONObject("geographic");
         double latitude = geographicObj.getDouble("latitude");
@@ -383,7 +384,7 @@ public class MapsActivity extends AppCompatActivity
         LatLng busStop = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions()
                           .position(busStop)
-                          .title(clickedStopNumber)
+                          .title(title)
                           .snippet(snippet)
                           .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
       }
