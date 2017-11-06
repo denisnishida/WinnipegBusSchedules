@@ -1,6 +1,7 @@
 package com.example.winnipegbusschedules;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -55,6 +56,8 @@ public class MapsActivity extends AppCompatActivity
   final String STATUS_SCHEDULE_REQUEST = "statuses/schedule";
   final String STOP_SCHEDULE_REQUEST_BEGIN = "stops";
   final String STOP_SCHEDULE_REQUEST_END = "/schedule";
+
+  final String STOP_NUMBER_KEY = "StopNumber";
 
   private GoogleMap mMap;
   private GoogleApiClient mGoogleApiClient;
@@ -115,9 +118,10 @@ public class MapsActivity extends AppCompatActivity
   @Override
   public void onInfoWindowClick(Marker marker)
   {
-    Toast.makeText(this,
-                    "This should open the stop schedule",
-                     Toast.LENGTH_SHORT).show();
+    // Open the stop activity for the clicked bus stop
+    Intent intent = new Intent(MapsActivity.this, StopActivity.class);
+    intent.putExtra("StopNumber", clickedStopNumber);
+    startActivity(intent);
   }
 
   @Override
