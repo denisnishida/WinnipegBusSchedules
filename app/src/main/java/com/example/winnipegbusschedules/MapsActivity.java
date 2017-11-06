@@ -21,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -39,7 +40,8 @@ public class MapsActivity extends AppCompatActivity
         implements GoogleMap.OnMyLocationButtonClickListener,
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnCameraIdleListener
 {
   final int MY_LOCATION_REQUEST_CODE = 1;
 
@@ -98,6 +100,7 @@ public class MapsActivity extends AppCompatActivity
     {
       mMap.setMyLocationEnabled(true);
       mMap.setOnMyLocationButtonClickListener(this);
+      mMap.setOnCameraIdleListener((GoogleMap.OnCameraIdleListener) this);
     }
     else
     {
@@ -105,6 +108,16 @@ public class MapsActivity extends AppCompatActivity
       ActivityCompat.requestPermissions(MapsActivity.this, new String[]
               {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
+  }
+
+  @Override
+  public void onCameraIdle()
+  {
+    CameraPosition cameraPosition = mMap.getCameraPosition();
+    LatLng cameraLatLng = cameraPosition.target;
+
+    Toast.makeText(this, cameraLatLng.latitude + " - " + cameraLatLng.longitude,
+            Toast.LENGTH_SHORT).show();
   }
 
   // Event Handler when the location button is clicked
