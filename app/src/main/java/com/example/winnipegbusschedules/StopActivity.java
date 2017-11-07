@@ -1,10 +1,17 @@
 package com.example.winnipegbusschedules;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -18,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class StopActivity extends AppCompatActivity
 {
@@ -169,12 +177,15 @@ public class StopActivity extends AppCompatActivity
   // Get the information from the stop schedule request
   private void parseStopSchedule(JSONObject object) throws JSONException
   {
-    String info = "";
+    TextView tvStop = (TextView) findViewById(R.id.tvStop);
+    ListView lvBuses = (ListView) findViewById(R.id.lvBuses);
 
     // Get Stop Information
     JSONObject stopObject = object.getJSONObject("stop");
-    info += "Stop: " + stopObject.getString("key") + " - "
-            + stopObject.getString("name") + "\n\n";
+    tvStop.setText("Stop: " + stopObject.getString("key") + ": "
+                    + stopObject.getString("name"));
+
+    ArrayList<BusItem> busItems = new ArrayList<>();
 
     // Get route schedules
     JSONArray routeSchedulesArray = object.getJSONArray("route-schedules");
@@ -185,26 +196,100 @@ public class StopActivity extends AppCompatActivity
 
       // Get route description
       JSONObject routeObj = routeScheduleObj.getJSONObject("route");
-      info += "Route " + routeObj.getString("number") + ":\n";
 
       // Get schedule and estimated times
       JSONArray scheduledArray = routeScheduleObj.getJSONArray("scheduled-stops");
       for (int j = 0; j < scheduledArray.length(); j++)
       {
+        BusItem busItem = new BusItem();
+
+        busItem.number = routeObj.getString("number");
+
         JSONObject scheduledObj = scheduledArray.getJSONObject(j);
 
         JSONObject variantObj = scheduledObj.getJSONObject("variant");
-        info += "      " + variantObj.getString("name") + "\n";
+        busItem.variantName = variantObj.getString("name");
 
         JSONObject arrivalObj = scheduledObj.getJSONObject("times").getJSONObject("arrival");
-        info += "      Scheduled: " + Helper.extractHourMinute(arrivalObj.getString("scheduled")) + "\n";
-        info += "      Estimated:  " + Helper.extractHourMinute(arrivalObj.getString("estimated")) + "\n\n";
+        busItem.scheduledTime = arrivalObj.getString("scheduled");
+        busItem.estimatedTime = arrivalObj.getString("estimated");
+
+        busItems.add(busItem);
       }
     }
 
-    Log.d("INFO", info);
-//    TextView tvSchedule = (TextView) findViewById(R.id.tvSchedule);
-//    tvSchedule.setText(info);
+    // create the adapter to populate the list view
+    FeedAdapter feedAdapter = new FeedAdapter(StopActivity.this, R.layout.routes_list_item, busItems);
+    lvBuses.setAdapter(feedAdapter);
+  }
+
+  // Custom ArrayAdapter for our ListView
+  private class FeedAdapter extends ArrayAdapter<BusItem>
+  {
+    private ArrayList<BusItem> items;
+
+    public FeedAdapter(Context context, int textViewResourceId, ArrayList<BusItem> items)
+    {
+      super(context, textViewResourceId, items);
+      this.items = items;
+    }
+
+    //This method is called once for every item in the ArrayList as the list is loaded.
+    //It returns a View -- a list item in the ListView -- for each item in the ArrayList
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
+      View v = convertView;
+
+      if (v == null) {
+        LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        v = vi.inflate(R.layout.routes_list_item, null);
+      }
+
+      BusItem o = items.get(position);
+
+      if (o != null)
+      {
+        TextView tvRoute = (TextView) v.findViewById(R.id.tvRoute);
+        TextView tvVariant = (TextView) v.findViewById(R.id.tvVariant);
+        TextView tvTimes = (TextView) v.findViewById(R.id.tvTimes);
+
+        if (tvRoute != null)
+        {
+          tvRoute.setText("Route " + o.number);
+          //tvRoute.setTypeface(typeface, typefaceStyle);
+        }
+
+        if (tvVariant != null)
+        {
+          tvVariant.setText(o.variantName);
+          //bt.setTypeface(typeface, typefaceStyle);
+        }
+
+        if (tvTimes != null)
+        {
+          tvTimes.setText("Scheduled: " + Helper.extractHourMinute(o.scheduledTime)
+                          + " | Estimated: " + Helper.extractHourMinute(o.estimatedTime));
+          //bt.setTypeface(typeface, typefaceStyle);
+        }
+      }
+
+      return v;
+    }
+  }
+
+  // Class that represents a bus in the list
+  private class BusItem
+  {
+    public String number;
+    public String variantName;
+    public String scheduledTime;
+    public String estimatedTime;
+
+    public BusItem()
+    {
+      number = variantName = scheduledTime = estimatedTime = "";
+    }
   }
 
 }
