@@ -1,11 +1,8 @@
 package com.example.winnipegbusschedules;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -48,23 +45,22 @@ public class MapsActivity extends AppCompatActivity
         GoogleMap.OnCameraIdleListener,
         GoogleMap.OnInfoWindowClickListener
 {
-  final int MY_LOCATION_REQUEST_CODE = 1;
+  public static final int MY_LOCATION_REQUEST_CODE = 1;
 
-  final String API_KEY = "api-key=rQ8lXW4lpLR9CwiYqK";
-  final String BEGIN_URL = "https://api.winnipegtransit.com/v2/";
-  final String JSON_APPEND = ".json";
-  final String STATUS_SCHEDULE_REQUEST = "statuses/schedule";
-  final String STOP_SCHEDULE_REQUEST_BEGIN = "stops";
-  final String STOP_SCHEDULE_REQUEST_END = "/schedule";
+  public static final String API_KEY = "api-key=rQ8lXW4lpLR9CwiYqK";
+  public static final String BEGIN_URL = "https://api.winnipegtransit.com/v2/";
+  public static final String JSON_APPEND = ".json";
+  public static final String STATUS_SCHEDULE_REQUEST = "statuses/schedule";
+  public static final String STOP_SCHEDULE_REQUEST_BEGIN = "stops";
+  public static final String STOP_SCHEDULE_REQUEST_END = "/schedule";
 
-  final String STOP_NUMBER_KEY = "StopNumber";
+  public static final String STOP_NUMBER_KEY = "StopNumber";
 
   private GoogleMap mMap;
   private GoogleApiClient mGoogleApiClient;
   private Location mLastLocation;
 
   String requestUrl;
-  String clickedStopNumber;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -120,7 +116,7 @@ public class MapsActivity extends AppCompatActivity
   {
     // Open the stop activity for the clicked bus stop
     Intent intent = new Intent(MapsActivity.this, StopActivity.class);
-    intent.putExtra("StopNumber", clickedStopNumber);
+    intent.putExtra("StopNumber", marker.getTitle().split(": ")[1]);
     startActivity(intent);
   }
 
@@ -239,16 +235,9 @@ public class MapsActivity extends AppCompatActivity
 
   }
 
-  private boolean isNetworkAvailable()
-  {
-    ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-  }
-
   public void processRequest()
   {
-    if (isNetworkAvailable())
+    if (Helper.isNetworkAvailable(this))
     {
       // create and execute AsyncTask
       ProcessingTask task = new ProcessingTask();
@@ -262,13 +251,6 @@ public class MapsActivity extends AppCompatActivity
 
   class ProcessingTask extends AsyncTask
   {
-    // On the start of the thread
-    @Override
-    protected void onPreExecute()
-    {
-      super.onPreExecute();
-    }
-
     @Override
     protected Object doInBackground(Object[] objects)
     {
@@ -377,8 +359,7 @@ public class MapsActivity extends AppCompatActivity
       {
         JSONObject stopObj = (JSONObject)stopsArray.get(i);
         String snippet = stopObj.getString("name");
-        clickedStopNumber = stopObj.getString("number");
-        String title = "Stop Number: " + clickedStopNumber;
+        String title = "Stop Number: " + stopObj.getString("number");
 
         JSONObject geographicObj = stopObj.getJSONObject("centre").getJSONObject("geographic");
         double latitude = geographicObj.getDouble("latitude");
