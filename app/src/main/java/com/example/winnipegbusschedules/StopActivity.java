@@ -93,7 +93,10 @@ public class StopActivity extends AppCompatActivity
       HttpURLConnection connection = null;
       try
       {
-        connection = (HttpURLConnection) url.openConnection();
+        if (url != null)
+        {
+          connection = (HttpURLConnection) url.openConnection();
+        }
       }
       catch (IOException e)
       {
@@ -121,7 +124,10 @@ public class StopActivity extends AppCompatActivity
       }
       finally
       {
-        connection.disconnect();
+        if (connection != null)
+        {
+          connection.disconnect();
+        }
       }
 
       return null;
@@ -177,15 +183,17 @@ public class StopActivity extends AppCompatActivity
   // Get the information from the stop schedule request
   private void parseStopSchedule(JSONObject object) throws JSONException
   {
-    TextView tvStop = (TextView) findViewById(R.id.tvStop);
-    ListView lvBuses = (ListView) findViewById(R.id.lvBuses);
+    TextView tvStop = findViewById(R.id.tvStop);
+    ListView lvBuses = findViewById(R.id.lvBuses);
 
     // Get Stop Information
     JSONObject stopObject = object.getJSONObject("stop");
-    tvStop.setText("Stop " + stopObject.getString("key") + ": "
-                    + stopObject.getString("name"));
 
-    ArrayList<BusItem> busItems = new ArrayList<>();
+    String text = "Stop " + stopObject.getString("key")
+                  + ": " + stopObject.getString("name");
+    tvStop.setText(text);
+
+    ArrayList<Transit.Bus> busItems = new ArrayList<>();
 
     // Get route schedules
     JSONArray routeSchedulesArray = object.getJSONArray("route-schedules");
@@ -199,9 +207,12 @@ public class StopActivity extends AppCompatActivity
 
       // Get schedule and estimated times
       JSONArray scheduledArray = routeScheduleObj.getJSONArray("scheduled-stops");
+
+      Transit transit = new Transit();
+
       for (int j = 0; j < scheduledArray.length(); j++)
       {
-        BusItem busItem = new BusItem();
+        Transit.Bus busItem = transit.new Bus();
 
         busItem.number = routeObj.getString("number");
 
@@ -224,11 +235,11 @@ public class StopActivity extends AppCompatActivity
   }
 
   // Custom ArrayAdapter for our ListView
-  private class FeedAdapter extends ArrayAdapter<BusItem>
+  private class FeedAdapter extends ArrayAdapter<Transit.Bus>
   {
-    private ArrayList<BusItem> items;
+    private ArrayList<Transit.Bus> items;
 
-    public FeedAdapter(Context context, int textViewResourceId, ArrayList<BusItem> items)
+    public FeedAdapter(Context context, int textViewResourceId, ArrayList<Transit.Bus> items)
     {
       super(context, textViewResourceId, items);
       this.items = items;
@@ -246,7 +257,7 @@ public class StopActivity extends AppCompatActivity
         v = vi.inflate(R.layout.routes_list_item, null);
       }
 
-      BusItem o = items.get(position);
+      Transit.Bus o = items.get(position);
 
       if (o != null)
       {
@@ -255,14 +266,16 @@ public class StopActivity extends AppCompatActivity
 
         if (tvRoute != null)
         {
-          tvRoute.setText(o.number + " - " + o.variantName);
+          String text = o.number + " - " + o.variantName;
+          tvRoute.setText(text);
           //tvRoute.setTypeface(typeface, typefaceStyle);
         }
 
         if (tvTimes != null)
         {
-          tvTimes.setText("Scheduled: " + Helper.extractHourMinute(o.scheduledTime)
-                          + " | Estimated: " + Helper.extractHourMinute(o.estimatedTime));
+          String text = "Scheduled: " + Helper.extractHourMinute(o.scheduledTime)
+                        + " | Estimated: " + Helper.extractHourMinute(o.estimatedTime);
+          tvTimes.setText(text);
           //bt.setTypeface(typeface, typefaceStyle);
         }
       }
@@ -271,25 +284,6 @@ public class StopActivity extends AppCompatActivity
     }
   }
 
-  // Class that represents a bus in the list
-  public class BusItem
-  {
-    public String number;
-    public String variantName;
-    public String scheduledTime;
-    public String estimatedTime;
 
-    public BusItem()
-    {
-      number = variantName = scheduledTime = estimatedTime = "";
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-      // To Do: comparison by time
-      return super.equals(obj);
-    }
-  }
 
 }

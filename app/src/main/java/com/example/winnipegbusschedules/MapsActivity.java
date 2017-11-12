@@ -129,6 +129,21 @@ public class MapsActivity extends AppCompatActivity
     double lat = cameraLatLng.latitude;
     double lon = cameraLatLng.longitude;
 
+    Location newLocation = new Location("new location");
+    newLocation.setLatitude(lat);
+    newLocation.setLongitude(lon);
+
+    if (mLastLocation.distanceTo(newLocation) > 300)
+    {
+      mLastLocation = newLocation;
+      requestStopsNearby(lat, lon);
+    }
+
+
+  }
+
+  private void requestStopsNearby(double lat, double lon)
+  {
     // URL to request the stops
     // ttp://api.winnipegtransit.com/v2/stops.json?distance=500&lat=49.895&lon=-97.138&api-key=rQ8lXW4lpLR9CwiYqK
     requestUrl = BEGIN_URL + STOP_SCHEDULE_REQUEST_BEGIN + JSON_APPEND
@@ -220,6 +235,8 @@ public class MapsActivity extends AppCompatActivity
       LatLng currentLocation = new LatLng(lat, lon);
 
       mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16));
+
+      requestStopsNearby(lat, lon);
     }
   }
 
