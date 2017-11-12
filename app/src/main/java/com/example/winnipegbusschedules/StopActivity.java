@@ -34,6 +34,7 @@ public class StopActivity extends AppCompatActivity
 {
   String requestUrl;
   String clickedStopNumber;
+  Transit.Stop stop;
   private DBHelper dbHelper;
 
   @Override
@@ -208,10 +209,9 @@ public class StopActivity extends AppCompatActivity
     ListView lvBuses = findViewById(R.id.lvBuses);
 
     // Get Stop Information
-    JSONObject stopObject = object.getJSONObject("stop");
+    stop = Helper.extractStopInfo(object.getJSONObject("stop"));
 
-    String text = "Stop " + stopObject.getString("key")
-                  + ": " + stopObject.getString("name");
+    String text = "Stop " + stop.number + ": " + stop.name;
     tvStop.setText(text);
 
     ArrayList<Transit.Bus> busItems = new ArrayList<>();
