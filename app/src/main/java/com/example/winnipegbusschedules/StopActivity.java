@@ -32,9 +32,9 @@ import java.util.ArrayList;
 
 public class StopActivity extends AppCompatActivity
 {
-  String requestUrl;
-  String clickedStopNumber;
-  Transit.Stop stop;
+  private String requestUrl;
+  private String clickedStopNumber;
+  private Transit.Stop stop;
   private DBHelper dbHelper;
 
   @Override
@@ -44,6 +44,8 @@ public class StopActivity extends AppCompatActivity
     setContentView(R.layout.activity_stop);
 
     dbHelper = new DBHelper(this);
+    ArrayList<String> test = dbHelper.loadData();
+    Log.d("WinnipegBusSchedules", test.get(0));
   }
 
   @Override
@@ -77,7 +79,21 @@ public class StopActivity extends AppCompatActivity
   @Override
   public boolean onOptionsItemSelected(MenuItem item)
   {
-    return super.onOptionsItemSelected(item);
+    switch (item.getItemId())
+    {
+      case R.id.miRefresh:
+        Toast.makeText(this, "Refreshing...", Toast.LENGTH_SHORT).show();
+        processRequest();
+        break;
+
+      case R.id.miSave:
+        Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
+        dbHelper.insertValues(stop.name, Integer.parseInt(stop.number),
+                              stop.latitude, stop.longitude);
+        break;
+    }
+
+    return true;
   }
 
   public void processRequest()

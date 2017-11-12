@@ -70,7 +70,7 @@ public class DBHelper extends SQLiteOpenHelper
   }
 
   //Insert values using content values
-  public void insertValues(String name, int id, String lat, String lon)
+  public void insertValues(String name, int id, double lat, double lon)
   {
     //get an instance of a writable database
     SQLiteDatabase db = this.getWritableDatabase();
