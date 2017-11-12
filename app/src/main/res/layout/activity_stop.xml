@@ -8,23 +8,22 @@
     android:orientation="vertical"
     tools:context="com.example.winnipegbusschedules.StopActivity">
 
-    <TextView
-        android:id="@+id/tvStop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Stop Number and name"/>
-
-    <TextView
-        android:id="@+id/tvRoutesHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/routes_header"
-        />
+  <TextView
+      android:id="@+id/tvStop"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Stop Number and name"
+      android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+      android:textSize="18sp"/>
 
   <ListView
       android:id="@+id/lvBuses"
+      style="@android:style/Widget.Holo.Light.ListView"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"/>
+      android:layout_height="wrap_content"
+      android:background="@color/wallet_hint_foreground_holo_dark"
+      android:backgroundTint="@color/wallet_bright_foreground_holo_dark"
+      android:divider="@color/wallet_holo_blue_light"/>
 
   </LinearLayout>
 

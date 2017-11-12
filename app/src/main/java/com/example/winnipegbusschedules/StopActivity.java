@@ -182,7 +182,7 @@ public class StopActivity extends AppCompatActivity
 
     // Get Stop Information
     JSONObject stopObject = object.getJSONObject("stop");
-    tvStop.setText("Stop: " + stopObject.getString("key") + ": "
+    tvStop.setText("Stop " + stopObject.getString("key") + ": "
                     + stopObject.getString("name"));
 
     ArrayList<BusItem> busItems = new ArrayList<>();
@@ -251,19 +251,12 @@ public class StopActivity extends AppCompatActivity
       if (o != null)
       {
         TextView tvRoute = (TextView) v.findViewById(R.id.tvRoute);
-        TextView tvVariant = (TextView) v.findViewById(R.id.tvVariant);
         TextView tvTimes = (TextView) v.findViewById(R.id.tvTimes);
 
         if (tvRoute != null)
         {
-          tvRoute.setText("Route " + o.number);
+          tvRoute.setText(o.number + " - " + o.variantName);
           //tvRoute.setTypeface(typeface, typefaceStyle);
-        }
-
-        if (tvVariant != null)
-        {
-          tvVariant.setText(o.variantName);
-          //bt.setTypeface(typeface, typefaceStyle);
         }
 
         if (tvTimes != null)
@@ -279,7 +272,7 @@ public class StopActivity extends AppCompatActivity
   }
 
   // Class that represents a bus in the list
-  private class BusItem
+  public class BusItem
   {
     public String number;
     public String variantName;
@@ -289,6 +282,13 @@ public class StopActivity extends AppCompatActivity
     public BusItem()
     {
       number = variantName = scheduledTime = estimatedTime = "";
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+      // To Do: comparison by time
+      return super.equals(obj);
     }
   }
 
