@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -31,12 +34,15 @@ public class StopActivity extends AppCompatActivity
 {
   String requestUrl;
   String clickedStopNumber;
+  private DBHelper dbHelper;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stop);
+
+    dbHelper = new DBHelper(this);
   }
 
   @Override
@@ -56,6 +62,21 @@ public class StopActivity extends AppCompatActivity
                 + MapsActivity.API_KEY;
 
     processRequest();
+  }
+
+  // Create the menu options with the menu_layout.xml file
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu)
+  {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.menu_layout, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item)
+  {
+    return super.onOptionsItemSelected(item);
   }
 
   public void processRequest()
