@@ -81,6 +81,8 @@ public class MapsActivity extends AppCompatActivity
               .addApi(LocationServices.API)
               .build();
     }
+
+    mLastLocation = null;
   }
 
 
@@ -114,10 +116,21 @@ public class MapsActivity extends AppCompatActivity
   @Override
   public void onInfoWindowClick(Marker marker)
   {
+    mLastLocation = createNewLocation(marker.getPosition().latitude, marker.getPosition().longitude);
+
     // Open the stop activity for the clicked bus stop
     Intent intent = new Intent(MapsActivity.this, StopActivity.class);
     intent.putExtra("StopNumber", marker.getTitle().split(": ")[1]);
     startActivity(intent);
+  }
+
+  private Location createNewLocation(double lat, double lon)
+  {
+    Location newLocation = new Location("new location");
+    newLocation.setLatitude(lat);
+    newLocation.setLongitude(lon);
+
+    return newLocation;
   }
 
   @Override
@@ -129,9 +142,7 @@ public class MapsActivity extends AppCompatActivity
     double lat = cameraLatLng.latitude;
     double lon = cameraLatLng.longitude;
 
-    Location newLocation = new Location("new location");
-    newLocation.setLatitude(lat);
-    newLocation.setLongitude(lon);
+    Location newLocation = createNewLocation(lat, lon);
 
     if (mLastLocation.distanceTo(newLocation) > 300)
     {
@@ -210,22 +221,25 @@ public class MapsActivity extends AppCompatActivity
   @Override
   public void onConnected(Bundle connectionHint)
   {
-    if (ActivityCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this,
-                              android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+    if (mLastLocation == null)
     {
-      // TODO: Consider calling
-      //    ActivityCompat#requestPermissions
-      // here to request the missing permissions, and then overriding
-      //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-      //                                          int[] grantResults)
-      // to handle the case where the user grants the permission. See the documentation
-      // for ActivityCompat#requestPermissions for more details.
-      return;
-    }
+      if (ActivityCompat.checkSelfPermission(this,
+                      android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                      && ActivityCompat.checkSelfPermission(this,
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+      {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        return;
+      }
 
-    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+      mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    }
 
     if (mLastLocation != null)
     {
