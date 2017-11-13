@@ -56,7 +56,7 @@ public class DBHelper extends SQLiteOpenHelper
                                                 + ROUTE_COL_NAME + " TEXT NOT NULL, "
                                                 + ROUTE_COL_SCHEDULED_TIME + " DATETIME NOT NULL, "
                                                 + ROUTE_COL_ESTIMATED_TIME + " DATETIME, "
-                                                + ROUTE_COL_STOP_ID + " INTEGER"
+                                                + ROUTE_COL_STOP_ID + " INTEGER, "
                                                 + "FOREIGN KEY(" + ROUTE_COL_STOP_ID
                                                   + ") REFERENCES " + TABLE_STOPS + "("
                                                   + STOP_COL_ID + ")"

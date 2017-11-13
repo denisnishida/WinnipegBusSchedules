@@ -87,9 +87,9 @@ public class MapsActivity extends AppCompatActivity
     mLastLocation = null;
 
     dbHelper = new DBHelper(this);
-    ArrayList<Transit.Stop> test = dbHelper.loadDataStops();
-    for (int i = 0; i < test.size(); i++)
-      Log.d("Database", test.get(i).name + " | " + test.get(i).number);
+//    ArrayList<Transit.Stop> test = dbHelper.loadDataStops();
+//    for (int i = 0; i < test.size(); i++)
+//      Log.d("Database", test.get(i).name + " | " + test.get(i).number);
   }
 
 
@@ -117,6 +117,28 @@ public class MapsActivity extends AppCompatActivity
       // Show rationale and request permission.
       ActivityCompat.requestPermissions(MapsActivity.this, new String[]
               {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+    }
+
+
+    if (!Helper.isNetworkAvailable(this))
+    {
+      ArrayList<Transit.Stop> stopsArray = dbHelper.loadDataStops();
+
+      for (int i = 0; i < stopsArray.size(); i++)
+      {
+        String snippet = stopsArray.get(i).name;
+        String title = "Stop Number: " + stopsArray.get(i).number;
+        double latitude = stopsArray.get(i).latitude;
+        double longitude = stopsArray.get(i).longitude;
+
+        // Add a marker in each bus stop
+        LatLng busStop = new LatLng(latitude, longitude);
+        mMap.addMarker(new MarkerOptions()
+                .position(busStop)
+                .title(title)
+                .snippet(snippet)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+      }
     }
   }
 
