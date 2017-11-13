@@ -261,7 +261,7 @@ public class StopActivity extends AppCompatActivity
     // Get Stop Information
     stop = Helper.extractStopInfo(object.getJSONObject("stop"));
 
-    String text = "Stop " + stop.number + ": " + stop.name;
+    String text = "Stop " + stop.number + " " + stop.name;
     tvStop.setText(text);
 
     ArrayList<Transit.Bus> busItems = new ArrayList<>();
@@ -358,7 +358,7 @@ public class StopActivity extends AppCompatActivity
 
         if (tvRoute != null)
         {
-          String text = o.number + " - " + o.variantName;
+          String text = o.number + " " + o.variantName;
           tvRoute.setText(text);
           //tvRoute.setTypeface(typeface, typefaceStyle);
         }

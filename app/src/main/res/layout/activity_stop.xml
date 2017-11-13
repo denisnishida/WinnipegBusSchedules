@@ -12,8 +12,11 @@
       android:id="@+id/tvStop"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:background="@android:color/black"
       android:text="Stop Number and name"
+      android:textAlignment="center"
       android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+      android:textColor="@android:color/white"
       android:textSize="18sp"/>
 
   <ListView
