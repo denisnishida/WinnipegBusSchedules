@@ -87,7 +87,7 @@ public class MapsActivity extends AppCompatActivity
     mLastLocation = null;
 
     dbHelper = new DBHelper(this);
-    ArrayList<Transit.Stop> test = dbHelper.loadData();
+    ArrayList<Transit.Stop> test = dbHelper.loadDataStops();
     for (int i = 0; i < test.size(); i++)
       Log.d("Database", test.get(i).name + " | " + test.get(i).number);
   }

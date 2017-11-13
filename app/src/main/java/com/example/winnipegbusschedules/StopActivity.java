@@ -88,8 +88,8 @@ public class StopActivity extends AppCompatActivity
 
       case R.id.miSave:
         Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
-        dbHelper.insertValues(stop.name, Integer.parseInt(stop.number),
-                              stop.latitude, stop.longitude);
+        dbHelper.insertStopValues(stop.name, Integer.parseInt(stop.number),
+                                  stop.latitude, stop.longitude);
         break;
     }
 
