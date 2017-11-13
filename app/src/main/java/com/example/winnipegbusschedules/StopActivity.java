@@ -44,8 +44,8 @@ public class StopActivity extends AppCompatActivity
     setContentView(R.layout.activity_stop);
 
     dbHelper = new DBHelper(this);
-    ArrayList<String> test = dbHelper.loadData();
-    Log.d("WinnipegBusSchedules", test.get(0));
+//    ArrayList<String> test = dbHelper.loadData();
+//    Log.d("WinnipegBusSchedules", test.get(0));
   }
 
   @Override

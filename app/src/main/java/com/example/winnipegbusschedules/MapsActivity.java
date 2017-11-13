@@ -36,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity
         implements GoogleMap.OnMyLocationButtonClickListener,
@@ -59,6 +60,7 @@ public class MapsActivity extends AppCompatActivity
   private GoogleMap mMap;
   private GoogleApiClient mGoogleApiClient;
   private Location mLastLocation;
+  private DBHelper dbHelper;
 
   String requestUrl;
 
@@ -83,6 +85,11 @@ public class MapsActivity extends AppCompatActivity
     }
 
     mLastLocation = null;
+
+    dbHelper = new DBHelper(this);
+    ArrayList<Transit.Stop> test = dbHelper.loadData();
+    for (int i = 0; i < test.size(); i++)
+      Log.d("Database", test.get(i).name + " | " + test.get(i).number);
   }
 
 

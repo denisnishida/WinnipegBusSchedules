@@ -109,9 +109,9 @@ public class DBHelper extends SQLiteOpenHelper
 //  }
 
   //Load the data in the table
-  public ArrayList<String> loadData(){
+  public ArrayList<Transit.Stop> loadData(){
 
-    ArrayList<String> nameData = new ArrayList<String>();
+    ArrayList<Transit.Stop> stopArrayList = new ArrayList<>();
     //open the readable database
     SQLiteDatabase db = this.getReadableDatabase();
     //create an array of the table names
@@ -132,7 +132,15 @@ public class DBHelper extends SQLiteOpenHelper
     for(int i=0; i < c.getCount(); i++)
     {
       //assign the value to the corresponding array
-      nameData.add(c.getString(0));
+      Transit transit = new Transit();
+      Transit.Stop stop = transit.new Stop();
+      stop.name = c.getString(0);
+      stop.number = c.getString(1);
+      stop.latitude = c.getDouble(2);
+      stop.longitude = c.getDouble(3);
+
+      stopArrayList.add(stop);
+
       c.moveToNext();
     }
 
@@ -142,7 +150,7 @@ public class DBHelper extends SQLiteOpenHelper
     //close the database
     db.close();
 
-    return nameData;
+    return stopArrayList;
   }
 
   //This method is used to load the data from the table into a hash map
