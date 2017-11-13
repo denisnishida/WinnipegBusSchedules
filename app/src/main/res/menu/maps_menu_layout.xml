@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <item
+      android:id="@+id/miShowAll"
+      android:title="Show All Stops"/>
+  <item
+      android:id="@+id/miShowSaved"
+      android:title="Show Only Saved Stops"/>
+</menu>

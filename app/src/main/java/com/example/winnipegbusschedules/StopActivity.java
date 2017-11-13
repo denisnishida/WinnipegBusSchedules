@@ -2,6 +2,7 @@ package com.example.winnipegbusschedules;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,20 +29,31 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class StopActivity extends AppCompatActivity
 {
+  public static final String MAIN_PREFS = "Project Settings";
+  public static final String ORDER_BY_TIME_PREF = "orderByTime";
+
+  private boolean orderByTime;
   private String requestUrl;
   private String clickedStopNumber;
   private Transit.Stop stop;
   private DBHelper dbHelper;
+  private SharedPreferences sharedPreferences;
 
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stop);
+
+    sharedPreferences = getSharedPreferences(MAIN_PREFS, MODE_PRIVATE);
+    orderByTime = sharedPreferences.getBoolean(ORDER_BY_TIME_PREF, true);
 
     dbHelper = new DBHelper(this);
 //    ArrayList<String> test = dbHelper.loadData();
@@ -91,9 +103,31 @@ public class StopActivity extends AppCompatActivity
         dbHelper.insertStopValues(stop.name, Integer.parseInt(stop.number),
                                   stop.latitude, stop.longitude);
         break;
+
+      case R.id.miOrderByTime:
+        Toast.makeText(this, "Ordering by Time...", Toast.LENGTH_SHORT).show();
+        orderByTime = true;
+        processRequest();
+        break;
+
+      case R.id.miOrderByRoute:
+        Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
+        orderByTime = false;
+        processRequest();
+        break;
     }
 
     return true;
+  }
+
+  @Override
+  protected void onPause()
+  {
+    super.onPause();
+
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putBoolean(ORDER_BY_TIME_PREF, orderByTime);
+    editor.apply();
   }
 
   public void processRequest()
@@ -264,6 +298,27 @@ public class StopActivity extends AppCompatActivity
 
         busItems.add(busItem);
       }
+    }
+
+    if (orderByTime)
+    {
+      Collections.sort(busItems, new Comparator<Transit.Bus>()
+      {
+        @Override
+        public int compare(Transit.Bus bus, Transit.Bus t1)
+        {
+          try
+          {
+            return bus.getEstimatedTimeAsDate().compareTo(t1.getEstimatedTimeAsDate());
+          }
+          catch (ParseException e)
+          {
+            e.printStackTrace();
+          }
+
+          return 0;
+        }
+      });
     }
 
     // create the adapter to populate the list view

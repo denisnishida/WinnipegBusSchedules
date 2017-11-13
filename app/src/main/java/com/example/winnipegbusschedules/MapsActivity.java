@@ -10,6 +10,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -92,6 +95,33 @@ public class MapsActivity extends AppCompatActivity
 //      Log.d("Database", test.get(i).name + " | " + test.get(i).number);
   }
 
+  // Create the menu options with a menu xml file
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu)
+  {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.maps_menu_layout, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item)
+  {
+    switch (item.getItemId())
+    {
+      case R.id.miShowAll:
+        Toast.makeText(this, "Showing all stops...", Toast.LENGTH_SHORT).show();
+        // TO DO
+        break;
+
+      case R.id.miShowSaved:
+        Toast.makeText(this, "Showing only saved stops...", Toast.LENGTH_SHORT).show();
+        // TO DO
+        break;
+    }
+
+    return true;
+  }
 
   /**
    * Manipulates the map once available.
@@ -178,8 +208,6 @@ public class MapsActivity extends AppCompatActivity
       mLastLocation = newLocation;
       requestStopsNearby(lat, lon);
     }
-
-
   }
 
   private void requestStopsNearby(double lat, double lon)

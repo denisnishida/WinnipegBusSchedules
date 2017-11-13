@@ -12,4 +12,10 @@
       android:icon="@android:drawable/ic_menu_save"
       android:title="Save"
       app:showAsAction="always"/>
+  <item
+      android:id="@+id/miOrderByTime"
+      android:title="Order by Time"/>
+  <item
+      android:id="@+id/miOrderByRoute"
+      android:title="Order by Route"/>
 </menu>
