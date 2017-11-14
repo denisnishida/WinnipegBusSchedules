@@ -40,6 +40,7 @@ public class Helper
     Transit transit = new Transit();
     Transit.Stop stop = transit.new Stop();
 
+    stop.key = stopObj.getString("key");
     stop.name = stopObj.getString("name");
     stop.number = stopObj.getString("number");
 
@@ -48,5 +49,25 @@ public class Helper
     stop.longitude = geographicObj.getDouble("longitude");
 
     return stop;
+  }
+
+  public static Transit.Bus extractBusInfo(String stopKey, JSONObject routeObj, JSONObject scheduledObj) throws JSONException
+  {
+    Transit transit = new Transit();
+    Transit.Bus busItem = transit.new Bus();
+
+    busItem.number = routeObj.getString("number");
+    busItem.key = scheduledObj.getString("key");
+
+    JSONObject variantObj = scheduledObj.getJSONObject("variant");
+    busItem.variantName = variantObj.getString("name");
+
+    JSONObject arrivalObj = scheduledObj.getJSONObject("times").getJSONObject("arrival");
+    busItem.scheduledTime = arrivalObj.getString("scheduled");
+    busItem.estimatedTime = arrivalObj.getString("estimated");
+
+    busItem.stopId = stopKey;
+
+    return busItem;
   }
 }

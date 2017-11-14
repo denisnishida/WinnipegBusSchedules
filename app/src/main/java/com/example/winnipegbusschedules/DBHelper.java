@@ -28,10 +28,12 @@ public class DBHelper extends SQLiteOpenHelper
   //Create constants defining your stops table column names
   private static final String STOP_COL_NAME = "name";
   private static final String STOP_COL_ID = "id";
+  private static final String STOP_COL_NUMBER = "number";
   private static final String STOP_COL_LAT = "latitude";
   private static final String STOP_COL_LON = "longitude";
 
   //Create constants defining your routes table column names
+  private static final String ROUTE_COL_ID = "id";
   private static final String ROUTE_COL_NUMBER = "number";
   private static final String ROUTE_COL_NAME = "name";
   private static final String ROUTE_COL_SCHEDULED_TIME = "scheduled_time";
@@ -39,24 +41,26 @@ public class DBHelper extends SQLiteOpenHelper
   private static final String ROUTE_COL_STOP_ID = "stop_id";
 
   //Define the database version
-  private static final int DB_VERSION = 2;
+  private static final int DB_VERSION = 3;
 
   //Define your create statement in typical sql format
   //CREATE TABLE {Tablename} (
   //Colname coltype
   //)
   private static final String TABLE_STOPS_CREATE = "CREATE TABLE " + TABLE_STOPS + " ("
-                                                + STOP_COL_ID + " INTEGER PRIMARY KEY, "
+                                                + STOP_COL_ID + " VARCHAR PRIMARY KEY, "
                                                 + STOP_COL_NAME + " TEXT NOT NULL, "
+                                                + STOP_COL_NUMBER + " VARCHAR, "
                                                 + STOP_COL_LAT + " VARCHAR NOT NULL, "
                                                 + STOP_COL_LON + " VARCHAR NOT NULL" + ");";
 
   private static final String TABLE_ROUTES_CREATE = "CREATE TABLE " + TABLE_ROUTES + " ("
-                                                + ROUTE_COL_NUMBER + " INTEGER, "
+                                                + ROUTE_COL_ID + " VARCHAR PRIMARY KEY, "
+                                                + ROUTE_COL_NUMBER + " VARCHAR, "
                                                 + ROUTE_COL_NAME + " TEXT NOT NULL, "
                                                 + ROUTE_COL_SCHEDULED_TIME + " DATETIME NOT NULL, "
                                                 + ROUTE_COL_ESTIMATED_TIME + " DATETIME, "
-                                                + ROUTE_COL_STOP_ID + " INTEGER, "
+                                                + ROUTE_COL_STOP_ID + " VARCHAR, "
                                                 + "FOREIGN KEY(" + ROUTE_COL_STOP_ID
                                                   + ") REFERENCES " + TABLE_STOPS + "("
                                                   + STOP_COL_ID + ")"
@@ -91,7 +95,7 @@ public class DBHelper extends SQLiteOpenHelper
   }
 
   // Insert values using content values
-  public void insertStopValues(String name, int id, double lat, double lon)
+  public void insertStopValues(String name, String id, String number, double lat, double lon)
   {
     //get an instance of a writable database
     SQLiteDatabase db = this.getWritableDatabase();
@@ -105,6 +109,7 @@ public class DBHelper extends SQLiteOpenHelper
     //insertValues.put(ColumnName, value);
     insertValues.put(STOP_COL_NAME, name);
     insertValues.put(STOP_COL_ID, id);
+    insertValues.put(STOP_COL_NUMBER, number);
     insertValues.put(STOP_COL_LAT, lat);
     insertValues.put(STOP_COL_LON, lon);
 
@@ -116,8 +121,9 @@ public class DBHelper extends SQLiteOpenHelper
   }
 
   // Insert values using content values
-  public void insertRoutesValues(String name, int number, String scheduled_time,
-                                 String estimated_time, int stopId)
+  public void insertRoutesValues(String name, String number,
+                                 String id, String scheduled_time,
+                                 String estimated_time, String stopId)
   {
     //get an instance of a writable database
     SQLiteDatabase db = this.getWritableDatabase();
@@ -129,6 +135,7 @@ public class DBHelper extends SQLiteOpenHelper
 
     //Add values to the ContentValues:
     //insertValues.put(ColumnName, value);
+    insertValues.put(ROUTE_COL_ID, id);
     insertValues.put(ROUTE_COL_NAME, name);
     insertValues.put(ROUTE_COL_NUMBER, number);
     insertValues.put(ROUTE_COL_SCHEDULED_TIME, scheduled_time);
@@ -163,7 +170,7 @@ public class DBHelper extends SQLiteOpenHelper
     //open the readable database
     SQLiteDatabase db = this.getReadableDatabase();
     //create an array of the table names
-    String[] selection = {STOP_COL_NAME, STOP_COL_ID, STOP_COL_LAT, STOP_COL_LON};
+    String[] selection = {STOP_COL_NAME, STOP_COL_NUMBER, STOP_COL_LAT, STOP_COL_LON};
     //Create a cursor item for querying the database
     Cursor c = db.query(TABLE_STOPS,	//The name of the table to query
             selection,				//The columns to return
@@ -202,7 +209,7 @@ public class DBHelper extends SQLiteOpenHelper
   }
 
   // Load the data in the table
-  public ArrayList<Transit.Bus> loadDataRoutes(int stopId)
+  public ArrayList<Transit.Bus> loadDataRoutes(String stopId)
   {
     ArrayList<Transit.Bus> routeArrayList = new ArrayList<>();
     //open the readable database
@@ -214,7 +221,7 @@ public class DBHelper extends SQLiteOpenHelper
     Cursor c = db.query(TABLE_ROUTES,	//The name of the table to query
                         selection,				        //The columns to return
                         ROUTE_COL_STOP_ID + " =?",		    //The columns for the where clause
-                        new String[]{Integer.toString(stopId)}, //The values for the where clause
+                        new String[]{stopId}, //The values for the where clause
                         null,					    //Group the rows
                         null,					    //Filter the row groups
                         null);					  //The sort order

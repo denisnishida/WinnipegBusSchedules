@@ -17,14 +17,16 @@ public class Transit
   // Class that represents a bus
   public class Bus
   {
+    public String key;
     public String number;
     public String variantName;
     public String scheduledTime;
     public String estimatedTime;
+    public String stopId;
 
     public Bus()
     {
-      number = variantName = scheduledTime = estimatedTime = "";
+      key = number = variantName = scheduledTime = estimatedTime = "";
     }
 
     public Date getEstimatedTimeAsDate() throws ParseException
@@ -44,6 +46,7 @@ public class Transit
   // Class that represents a stop
   public class Stop
   {
+    public String key;
     public String number;
     public String name;
     public double latitude;
@@ -51,7 +54,7 @@ public class Transit
 
     public Stop()
     {
-      number = name = "";
+      key = number = name = "";
       latitude = longitude = 0;
     }
 

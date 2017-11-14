@@ -43,6 +43,7 @@ public class StopActivity extends AppCompatActivity
   private String requestUrl;
   private String clickedStopNumber;
   private Transit.Stop stop;
+  private ArrayList<Transit.Bus> busItems;
   private DBHelper dbHelper;
   private SharedPreferences sharedPreferences;
 
@@ -56,8 +57,7 @@ public class StopActivity extends AppCompatActivity
     orderByTime = sharedPreferences.getBoolean(ORDER_BY_TIME_PREF, true);
 
     dbHelper = new DBHelper(this);
-//    ArrayList<String> test = dbHelper.loadData();
-//    Log.d("WinnipegBusSchedules", test.get(0));
+
   }
 
   @Override
@@ -68,6 +68,9 @@ public class StopActivity extends AppCompatActivity
     // Get the stop number in the intent
     Intent intent = getIntent();
     clickedStopNumber = intent.getStringExtra(MapsActivity.STOP_NUMBER_KEY);
+
+    ArrayList<Transit.Bus> test = dbHelper.loadDataRoutes(clickedStopNumber);
+//    Log.d("WinnipegBusSchedules", test.get(0));
 
     requestUrl = MapsActivity.BEGIN_URL
                 + MapsActivity.STOP_SCHEDULE_REQUEST_BEGIN
@@ -100,8 +103,15 @@ public class StopActivity extends AppCompatActivity
 
       case R.id.miSave:
         Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
-        dbHelper.insertStopValues(stop.name, Integer.parseInt(stop.number),
+        dbHelper.insertStopValues(stop.name, stop.key, stop.number,
                                   stop.latitude, stop.longitude);
+
+        for (int i = 0; i < busItems.size(); i++)
+        {
+          Transit.Bus bus = busItems.get(i);
+          dbHelper.insertRoutesValues(bus.variantName, bus.number, bus.key, bus.scheduledTime,
+                                      bus.estimatedTime, bus.stopId);
+        }
         break;
 
       case R.id.miOrderByTime:
@@ -264,10 +274,10 @@ public class StopActivity extends AppCompatActivity
     String text = "Stop " + stop.number + " " + stop.name;
     tvStop.setText(text);
 
-    ArrayList<Transit.Bus> busItems = new ArrayList<>();
-
     // Get route schedules
     JSONArray routeSchedulesArray = object.getJSONArray("route-schedules");
+
+    busItems = new ArrayList<>();
 
     for (int i = 0; i < routeSchedulesArray.length(); i++)
     {
@@ -279,23 +289,9 @@ public class StopActivity extends AppCompatActivity
       // Get schedule and estimated times
       JSONArray scheduledArray = routeScheduleObj.getJSONArray("scheduled-stops");
 
-      Transit transit = new Transit();
-
       for (int j = 0; j < scheduledArray.length(); j++)
       {
-        Transit.Bus busItem = transit.new Bus();
-
-        busItem.number = routeObj.getString("number");
-
-        JSONObject scheduledObj = scheduledArray.getJSONObject(j);
-
-        JSONObject variantObj = scheduledObj.getJSONObject("variant");
-        busItem.variantName = variantObj.getString("name");
-
-        JSONObject arrivalObj = scheduledObj.getJSONObject("times").getJSONObject("arrival");
-        busItem.scheduledTime = arrivalObj.getString("scheduled");
-        busItem.estimatedTime = arrivalObj.getString("estimated");
-
+        Transit.Bus busItem = Helper.extractBusInfo(stop.key, routeObj, scheduledArray.getJSONObject(j));
         busItems.add(busItem);
       }
     }
