@@ -90,9 +90,6 @@ public class MapsActivity extends AppCompatActivity
     mLastLocation = null;
 
     dbHelper = new DBHelper(this);
-//    ArrayList<Transit.Stop> test = dbHelper.loadDataStops();
-//    for (int i = 0; i < test.size(); i++)
-//      Log.d("Database", test.get(i).name + " | " + test.get(i).number);
   }
 
   // Create the menu options with a menu xml file
@@ -206,7 +203,11 @@ public class MapsActivity extends AppCompatActivity
     if (mLastLocation.distanceTo(newLocation) > 300)
     {
       mLastLocation = newLocation;
-      requestStopsNearby(lat, lon);
+
+      if (Helper.isNetworkAvailable(this))
+      {
+        requestStopsNearby(lat, lon);
+      }
     }
   }
 

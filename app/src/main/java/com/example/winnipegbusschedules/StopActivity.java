@@ -122,17 +122,52 @@ public class StopActivity extends AppCompatActivity
       case R.id.miOrderByTime:
         Toast.makeText(this, "Ordering by Time...", Toast.LENGTH_SHORT).show();
         orderByTime = true;
-        processRequest();
+        setRoutesListView();
         break;
 
       case R.id.miOrderByRoute:
         Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
         orderByTime = false;
-        processRequest();
+        setRoutesListView();
         break;
     }
 
     return true;
+  }
+
+  private void setRoutesListView()
+  {
+
+    Collections.sort(busItems, new Comparator<Transit.Bus>()
+    {
+      @Override
+      public int compare(Transit.Bus bus, Transit.Bus t1)
+      {
+        try
+        {
+          if (orderByTime)
+          {
+            return bus.getEstimatedTimeAsDate().compareTo(t1.getEstimatedTimeAsDate());
+          }
+          else
+          {
+            return bus.number.compareTo(t1.number);
+          }
+        }
+        catch (ParseException e)
+        {
+          e.printStackTrace();
+        }
+
+        return 0;
+      }
+    });
+
+    // create the adapter to populate the list view
+    FeedAdapter feedAdapter = new FeedAdapter(StopActivity.this, R.layout.routes_list_item, busItems);
+
+    ListView lvBuses = findViewById(R.id.lvBuses);
+    lvBuses.setAdapter(feedAdapter);
   }
 
   @Override
@@ -284,7 +319,6 @@ public class StopActivity extends AppCompatActivity
   private void parseStopSchedule(JSONObject object) throws JSONException
   {
     TextView tvStop = findViewById(R.id.tvStop);
-    ListView lvBuses = findViewById(R.id.lvBuses);
 
     // Get Stop Information
     stop = Helper.extractStopInfo(object.getJSONObject("stop"));
@@ -314,30 +348,7 @@ public class StopActivity extends AppCompatActivity
       }
     }
 
-    if (orderByTime)
-    {
-      Collections.sort(busItems, new Comparator<Transit.Bus>()
-      {
-        @Override
-        public int compare(Transit.Bus bus, Transit.Bus t1)
-        {
-          try
-          {
-            return bus.getEstimatedTimeAsDate().compareTo(t1.getEstimatedTimeAsDate());
-          }
-          catch (ParseException e)
-          {
-            e.printStackTrace();
-          }
-
-          return 0;
-        }
-      });
-    }
-
-    // create the adapter to populate the list view
-    FeedAdapter feedAdapter = new FeedAdapter(StopActivity.this, R.layout.routes_list_item, busItems);
-    lvBuses.setAdapter(feedAdapter);
+    setRoutesListView();
   }
 
   // Custom ArrayAdapter for our ListView
