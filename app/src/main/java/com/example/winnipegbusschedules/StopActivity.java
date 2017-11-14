@@ -69,9 +69,6 @@ public class StopActivity extends AppCompatActivity
     Intent intent = getIntent();
     clickedStopNumber = intent.getStringExtra(MapsActivity.STOP_NUMBER_KEY);
 
-    ArrayList<Transit.Bus> test = dbHelper.loadDataRoutes(clickedStopNumber);
-//    Log.d("WinnipegBusSchedules", test.get(0));
-
     requestUrl = MapsActivity.BEGIN_URL
                 + MapsActivity.STOP_SCHEDULE_REQUEST_BEGIN
                 + "/" + clickedStopNumber
@@ -102,16 +99,24 @@ public class StopActivity extends AppCompatActivity
         break;
 
       case R.id.miSave:
-        Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
-        dbHelper.insertStopValues(stop.name, stop.key, stop.number,
-                                  stop.latitude, stop.longitude);
-
-        for (int i = 0; i < busItems.size(); i++)
+        if (Helper.isNetworkAvailable(this))
         {
-          Transit.Bus bus = busItems.get(i);
-          dbHelper.insertRoutesValues(bus.variantName, bus.number, bus.key, bus.scheduledTime,
-                                      bus.estimatedTime, bus.stopId);
+          Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
+          dbHelper.insertStopValues(stop.name, stop.key, stop.number,
+                                    stop.latitude, stop.longitude);
+
+          for (int i = 0; i < busItems.size(); i++)
+          {
+            Transit.Bus bus = busItems.get(i);
+            dbHelper.insertRoutesValues(bus.variantName, bus.number, bus.key, bus.scheduledTime,
+                                        bus.estimatedTime, bus.stopId);
+          }
         }
+        else
+        {
+          Toast.makeText(this, "It is not possible to save stop when offline.", Toast.LENGTH_SHORT).show();
+        }
+
         break;
 
       case R.id.miOrderByTime:
@@ -151,6 +156,19 @@ public class StopActivity extends AppCompatActivity
     else
     {
       Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show();
+
+      stop = dbHelper.loadDataStop(clickedStopNumber);
+
+      TextView tvStop = findViewById(R.id.tvStop);
+      String text = "Stop " + stop.number + " " + stop.name;
+      tvStop.setText(text);
+
+      busItems = dbHelper.loadDataRoutes(clickedStopNumber);
+      // create the adapter to populate the list view
+      FeedAdapter feedAdapter = new FeedAdapter(StopActivity.this, R.layout.routes_list_item, busItems);
+
+      ListView lvBuses = findViewById(R.id.lvBuses);
+      lvBuses.setAdapter(feedAdapter);
     }
   }
 

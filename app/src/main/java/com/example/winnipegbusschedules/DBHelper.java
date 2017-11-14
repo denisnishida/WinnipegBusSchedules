@@ -164,8 +164,8 @@ public class DBHelper extends SQLiteOpenHelper
 //  }
 
   // Load the data in the table
-  public ArrayList<Transit.Stop> loadDataStops(){
-
+  public ArrayList<Transit.Stop> loadDataStops()
+  {
     ArrayList<Transit.Stop> stopArrayList = new ArrayList<>();
     //open the readable database
     SQLiteDatabase db = this.getReadableDatabase();
@@ -206,6 +206,42 @@ public class DBHelper extends SQLiteOpenHelper
     db.close();
 
     return stopArrayList;
+  }
+
+  // Load the data in the table
+  public Transit.Stop loadDataStop(String stopId)
+  {
+    //open the readable database
+    SQLiteDatabase db = this.getReadableDatabase();
+    //create an array of the table names
+    String[] selection = {STOP_COL_NAME, STOP_COL_NUMBER, STOP_COL_LAT, STOP_COL_LON};
+    //Create a cursor item for querying the database
+    Cursor c = db.query(TABLE_STOPS,	//The name of the table to query
+            selection,				//The columns to return
+            STOP_COL_ID + " =?",					//The columns for the where clause
+            new String[]{stopId},					//The values for the where clause
+            null,					//Group the rows
+            null,					//Filter the row groups
+            null);					//The sort order
+
+    //Move to the first row
+    c.moveToFirst();
+
+    //assign the value to the corresponding array
+    Transit transit = new Transit();
+    Transit.Stop stop = transit.new Stop();
+    stop.name = c.getString(0);
+    stop.number = c.getString(1);
+    stop.latitude = c.getDouble(2);
+    stop.longitude = c.getDouble(3);
+
+    //close the cursor
+    c.close();
+
+    //close the database
+    db.close();
+
+    return stop;
   }
 
   // Load the data in the table
