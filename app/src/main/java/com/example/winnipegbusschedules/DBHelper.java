@@ -5,11 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Denis on 12/11/2017.
@@ -145,23 +146,11 @@ public class DBHelper extends SQLiteOpenHelper
     //insert the values into the table
     db.insert(TABLE_ROUTES, null, insertValues);
 
+    //db.execSQL("UPDATE routes SET estimated_time = datetime('now', 'locale') WHERE stop_id = 10409");
+
     //close the database
     db.close();
   }
-
-//  public void saveExec(String name, int age)
-//  {
-//    //Open your writable database
-//    SQLiteDatabase db = this.getWritableDatabase();
-//
-//    //Formulate your statement
-//    String insertStatement = "INSERT INTO 'People' VALUES('" + name +"'," + age + ");";
-//
-//    //Execute your statement
-//    db.execSQL(insertStatement);
-//
-//    db.close();
-//  }
 
   // Load the data in the table
   public ArrayList<Transit.Stop> loadDataStops()
@@ -290,47 +279,27 @@ public class DBHelper extends SQLiteOpenHelper
     return routeArrayList;
   }
 
-  //This method is used to load the data from the table into a hash map
-  //this enables the use of multiple textviews in the listview
-  public List<Map<String,String>> loadData2()
+  public void deleteStop(String stopId)
   {
-    List<Map<String,String>> lm = new ArrayList<Map<String,String>>();
+    //get an instance of a writable database
+    SQLiteDatabase db = this.getWritableDatabase();
 
-    //open the readable database
-    SQLiteDatabase db = this.getReadableDatabase();
-    //create an array of the table names
-    String[] selection = {STOP_COL_NAME, STOP_COL_ID, STOP_COL_LAT, STOP_COL_LON};
-    //Create a cursor item for querying the database
-    Cursor c = db.query(TABLE_STOPS,	//The name of the table to query
-            selection,				//The columns to return
-            null,					//The columns for the where clause
-            null,					//The values for the where clause
-            null,					//Group the rows
-            null,					//Filter the row groups
-            null);					//The sort order
+    db.delete(TABLE_STOPS, STOP_COL_ID + " = " + stopId, null);
+  }
 
+  public void deleteOldRoutes(String stopId)
+  {
+    // Get current time
+    String current_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(new Date());
+    Log.d("Test", current_time);
 
+    //get an instance of a writable database
+    SQLiteDatabase db = this.getWritableDatabase();
 
-    //Move to the first row
-    c.moveToFirst();
+    int result = db.delete(TABLE_ROUTES,
+              ROUTE_COL_STOP_ID + " = " + stopId + " AND "
+                 + ROUTE_COL_ESTIMATED_TIME + " < Datetime('" + current_time + "')", null);
 
-    //For each row that was retrieved
-    for(int i=0; i < c.getCount(); i++)
-    {
-      Map<String,String> map = new HashMap<String,String>();
-      //assign the value to the corresponding array
-      map.put("Name", c.getString(0));
-      map.put("Age", String.valueOf(c.getInt(1)));
-
-      lm.add(map);
-      c.moveToNext();
-    }
-
-    //close the cursor
-    c.close();
-    //close the database
-    db.close();
-    return lm;
-
+    Log.d("Test", "Delete result: " + result);
   }
 }

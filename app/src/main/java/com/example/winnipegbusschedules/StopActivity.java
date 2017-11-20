@@ -119,6 +119,13 @@ public class StopActivity extends AppCompatActivity
 
         break;
 
+      case R.id.miDelete:
+
+        Toast.makeText(this, "Deleting Stop for offline use...", Toast.LENGTH_SHORT).show();
+        dbHelper.deleteStop(clickedStopNumber);
+
+        break;
+
       case R.id.miOrderByTime:
         Toast.makeText(this, "Ordering by Time...", Toast.LENGTH_SHORT).show();
         orderByTime = true;
@@ -129,6 +136,11 @@ public class StopActivity extends AppCompatActivity
         Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
         orderByTime = false;
         setRoutesListView();
+        break;
+
+      case R.id.miTest:
+        Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
+        dbHelper.deleteOldRoutes(clickedStopNumber);
         break;
     }
 

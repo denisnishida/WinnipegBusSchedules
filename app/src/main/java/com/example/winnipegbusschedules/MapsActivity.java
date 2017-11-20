@@ -200,6 +200,11 @@ public class MapsActivity extends AppCompatActivity
 
     Location newLocation = createNewLocation(lat, lon);
 
+    if (newLocation == null)
+    {
+      return;
+    }
+
     if (mLastLocation.distanceTo(newLocation) > 300)
     {
       mLastLocation = newLocation;

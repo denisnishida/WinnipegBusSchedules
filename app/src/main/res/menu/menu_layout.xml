@@ -13,9 +13,17 @@
       android:title="Save"
       app:showAsAction="always"/>
   <item
+      android:id="@+id/miDelete"
+      android:icon="@android:drawable/ic_delete"
+      android:title="Delete Stop"
+      app:showAsAction="ifRoom"/>
+  <item
       android:id="@+id/miOrderByTime"
       android:title="Order by Time"/>
   <item
       android:id="@+id/miOrderByRoute"
       android:title="Order by Route"/>
+  <item
+      android:id="@+id/miTest"
+      android:title="Clean old schedules"/>
 </menu>
