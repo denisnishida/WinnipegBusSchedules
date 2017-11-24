@@ -42,7 +42,7 @@ public class DBHelper extends SQLiteOpenHelper
   private static final String ROUTE_COL_STOP_ID = "stop_id";
 
   //Define the database version
-  private static final int DB_VERSION = 3;
+  private static final int DB_VERSION = 4;
 
   //Define your create statement in typical sql format
   //CREATE TABLE {Tablename} (
@@ -146,8 +146,6 @@ public class DBHelper extends SQLiteOpenHelper
     //insert the values into the table
     db.insert(TABLE_ROUTES, null, insertValues);
 
-    //db.execSQL("UPDATE routes SET estimated_time = datetime('now', 'locale') WHERE stop_id = 10409");
-
     //close the database
     db.close();
   }
@@ -241,7 +239,7 @@ public class DBHelper extends SQLiteOpenHelper
     SQLiteDatabase db = this.getReadableDatabase();
     //create an array of the table names
     String[] selection = {ROUTE_COL_NAME, ROUTE_COL_NUMBER,
-                          ROUTE_COL_SCHEDULED_TIME, ROUTE_COL_SCHEDULED_TIME};
+                          ROUTE_COL_SCHEDULED_TIME, ROUTE_COL_ESTIMATED_TIME};
     //Create a cursor item for querying the database
     Cursor c = db.query(TABLE_ROUTES,	//The name of the table to query
                         selection,				        //The columns to return
@@ -263,7 +261,9 @@ public class DBHelper extends SQLiteOpenHelper
       bus.variantName = c.getString(0);
       bus.number = c.getString(1);
       bus.scheduledTime = c.getString(2);
+      Log.d("Testing", "scheduled: " + c.getString(2));
       bus.estimatedTime = c.getString(3);
+      Log.d("Testing", "estimated: " + c.getString(3));
 
       routeArrayList.add(bus);
 
@@ -287,19 +287,19 @@ public class DBHelper extends SQLiteOpenHelper
     db.delete(TABLE_STOPS, STOP_COL_ID + " = " + stopId, null);
   }
 
-  public void deleteOldRoutes(String stopId)
+  public void deleteOldRoutes()
   {
     // Get current time
     String current_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(new Date());
-    Log.d("Test", current_time);
+    Log.d("Testing", current_time);
 
     //get an instance of a writable database
     SQLiteDatabase db = this.getWritableDatabase();
 
     int result = db.delete(TABLE_ROUTES,
-              ROUTE_COL_STOP_ID + " = " + stopId + " AND "
-                 + ROUTE_COL_ESTIMATED_TIME + " < Datetime('" + current_time + "')", null);
+                          "Datetime(" + ROUTE_COL_ESTIMATED_TIME + ") < Datetime('" + current_time + "')",
+                          null);
 
-    Log.d("Test", "Delete result: " + result);
+    Log.d("Testing", "Delete result: " + result);
   }
 }

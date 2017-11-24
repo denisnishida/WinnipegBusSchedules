@@ -140,7 +140,7 @@ public class StopActivity extends AppCompatActivity
 
       case R.id.miTest:
         Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
-        dbHelper.deleteOldRoutes(clickedStopNumber);
+        dbHelper.deleteOldRoutes();
         break;
     }
 
