@@ -3,6 +3,7 @@ package com.example.winnipegbusschedules;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -221,8 +222,16 @@ public class StopActivity extends AppCompatActivity
 
   public void processRequest()
   {
+    TextView tvStatus = findViewById(R.id.tvStatus);
+
     if (Helper.isNetworkAvailable(this))
     {
+      // Get current time
+      String current_time = new SimpleDateFormat("HH:mm", Locale.CANADA).format(new Date());
+
+      tvStatus.setText("Updated at " + current_time + " - Showing next 2 hour schedule");
+      tvStatus.setTextColor(Color.argb(255, 50,205,50));
+
       // create and execute AsyncTask
       ProcessingTask task = new ProcessingTask();
       task.execute();
@@ -230,6 +239,8 @@ public class StopActivity extends AppCompatActivity
     else
     {
       Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show();
+      tvStatus.setText("No internet connection - Showing saved next 1 day schedule");
+      tvStatus.setTextColor(Color.RED);
 
       stop = dbHelper.loadDataStop(clickedStopNumber);
 

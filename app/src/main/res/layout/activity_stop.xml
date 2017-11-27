@@ -13,20 +13,29 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="@android:color/black"
-      android:text="Stop Number and name"
       android:textAlignment="center"
       android:textAppearance="@style/TextAppearance.AppCompat.Headline"
       android:textColor="@android:color/white"
       android:textSize="18sp"/>
 
+  <TextView
+      android:id="@+id/tvStatus"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Just a second...."
+      android:textAlignment="center"
+      android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"/>
+
   <ListView
       android:id="@+id/lvBuses"
       style="@android:style/Widget.Holo.Light.ListView"
-      android:layout_width="wrap_content"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="@color/wallet_hint_foreground_holo_dark"
       android:backgroundTint="@color/wallet_bright_foreground_holo_dark"
-      android:divider="@color/wallet_holo_blue_light"/>
+      android:divider="@color/wallet_holo_blue_light"
+      android:headerDividersEnabled="true"
+      android:textAlignment="center"/>
 
   </LinearLayout>
 

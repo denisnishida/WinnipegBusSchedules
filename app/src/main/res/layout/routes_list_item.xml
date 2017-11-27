@@ -12,6 +12,7 @@
       android:id="@+id/tvRoute"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:paddingLeft="6dp"
       android:textAppearance="@style/TextAppearance.AppCompat.Title"
       android:textSize="18sp"/>
 
@@ -19,6 +20,7 @@
       android:id="@+id/tvTimes"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:paddingLeft="6dp"
       android:textAppearance="@style/TextAppearance.AppCompat"
       android:textColor="@color/wallet_link_text_light"/>
 
