@@ -45,6 +45,7 @@ public class StopActivity extends AppCompatActivity
 
   private boolean orderByTime;
   private String requestUrl;
+  private String defaultRequestUrl;
   private String clickedStopNumber;
   private Transit.Stop stop;
   private ArrayList<Transit.Bus> busItems;
@@ -74,12 +75,14 @@ public class StopActivity extends AppCompatActivity
     Intent intent = getIntent();
     clickedStopNumber = intent.getStringExtra(MapsActivity.STOP_NUMBER_KEY);
 
-    requestUrl = MapsActivity.BEGIN_URL
+    defaultRequestUrl = MapsActivity.BEGIN_URL
                 + MapsActivity.STOP_SCHEDULE_REQUEST_BEGIN
                 + "/" + clickedStopNumber
                 + MapsActivity.STOP_SCHEDULE_REQUEST_END
                 + MapsActivity.JSON_APPEND + "?"
                 + MapsActivity.API_KEY;
+
+    requestUrl = defaultRequestUrl;
 
     processRequest();
   }
@@ -108,6 +111,9 @@ public class StopActivity extends AppCompatActivity
         {
           Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
 
+          dbHelper.insertStopValues(stop.name, stop.key, stop.number,
+                  stop.latitude, stop.longitude);
+
           Date dt = new Date();
           Calendar c = Calendar.getInstance();
           c.setTime(dt);
@@ -125,17 +131,6 @@ public class StopActivity extends AppCompatActivity
                   + MapsActivity.API_KEY;
 
           processRequest();
-
-
-          dbHelper.insertStopValues(stop.name, stop.key, stop.number,
-                                    stop.latitude, stop.longitude);
-
-          for (int i = 0; i < busItems.size(); i++)
-          {
-            Transit.Bus bus = busItems.get(i);
-            dbHelper.insertRoutesValues(bus.variantName, bus.number, bus.key, bus.scheduledTime,
-                                        bus.estimatedTime, bus.stopId);
-          }
         }
         else
         {
@@ -314,6 +309,21 @@ public class StopActivity extends AppCompatActivity
         String response = o.toString();
         Log.i("INFO", o.toString());
         parseJSON(response);
+
+        // Checking if this stop is saved in the database
+        Transit.Stop tempStop = dbHelper.loadDataStop(stop.number);
+        if (tempStop != null)
+        {
+          // Store the schedules
+          for (int i = 0; i < busItems.size(); i++)
+          {
+            Transit.Bus bus = busItems.get(i);
+            dbHelper.insertRoutesValues(bus.variantName, bus.number, bus.key, bus.scheduledTime,
+                    bus.estimatedTime, bus.stopId);
+          }
+        }
+
+        requestUrl = defaultRequestUrl;
       }
       else
       {

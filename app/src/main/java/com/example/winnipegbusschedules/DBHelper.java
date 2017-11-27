@@ -212,16 +212,22 @@ public class DBHelper extends SQLiteOpenHelper
             null,					//Filter the row groups
             null);					//The sort order
 
-    //Move to the first row
-    c.moveToFirst();
-
-    //assign the value to the corresponding array
     Transit transit = new Transit();
     Transit.Stop stop = transit.new Stop();
-    stop.name = c.getString(0);
-    stop.number = c.getString(1);
-    stop.latitude = c.getDouble(2);
-    stop.longitude = c.getDouble(3);
+
+    //Move to the first row if exists
+    if (c.moveToFirst())
+    {
+      //assign the value to the corresponding array
+      stop.name = c.getString(0);
+      stop.number = c.getString(1);
+      stop.latitude = c.getDouble(2);
+      stop.longitude = c.getDouble(3);
+    }
+    else
+    {
+      stop = null;
+    }
 
     //close the cursor
     c.close();
