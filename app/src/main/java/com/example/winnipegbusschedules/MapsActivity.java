@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +29,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -156,15 +159,13 @@ public class MapsActivity extends AppCompatActivity
             android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     {
       mMap.setMyLocationEnabled(true);
-      mMap.setOnMyLocationButtonClickListener(this);
-      mMap.setOnCameraIdleListener(this);
       mMap.setOnInfoWindowClickListener(this);
     }
     else
     {
       // Show rationale and request permission.
       ActivityCompat.requestPermissions(MapsActivity.this, new String[]
-              {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+              {android.Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_REQUEST_CODE);
     }
 
     if (!Helper.isNetworkAvailable(this) || showOnlySavedPref)
@@ -327,19 +328,36 @@ public class MapsActivity extends AppCompatActivity
         return;
       }
 
-      mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-    }
+      // The FusedLocationProviderClient is the main entry point for interacting with the fused location provider.
+      FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapsActivity.this);
 
-    if (mLastLocation != null)
-    {
-      double lat = mLastLocation.getLatitude();
-      double lon = mLastLocation.getLongitude();
+      // call the getLastLocation() method of the FusedLocationProviderClient
+      // This method is an async task that returns the best most recent location currently available.
+      // This task has a method called getResult() which returns a Location object but will return
+      // an error if called before the task is finished.
+      Task<Location> taskLastLocation = fusedLocationProviderClient.getLastLocation();
 
-      LatLng currentLocation = new LatLng(lat, lon);
+      // The task has a listener that will trigger when the task is successfully completed
+      // This has an onSuccess method that passes in the Location object
+      taskLastLocation.addOnSuccessListener(new OnSuccessListener<Location>()
+      {
+        @Override
+        public void onSuccess(Location location)
+        {
+          mMap.setOnMyLocationButtonClickListener(MapsActivity.this);
+          mMap.setOnCameraIdleListener(MapsActivity.this);
+          mLastLocation = location;
 
-      mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16));
+          double lat = mLastLocation.getLatitude();
+          double lon = mLastLocation.getLongitude();
 
-      requestStopsNearby(lat, lon);
+          LatLng currentLocation = new LatLng(lat, lon);
+
+          mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 16));
+
+          requestStopsNearby(lat, lon);
+        }
+      });
     }
   }
 
