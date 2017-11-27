@@ -44,6 +44,7 @@ public class StopActivity extends AppCompatActivity
   public static final String ORDER_BY_TIME_PREF = "orderByTime";
 
   private boolean orderByTime;
+  private boolean savingSchedule;
   private String requestUrl;
   private String defaultRequestUrl;
   private String clickedStopNumber;
@@ -62,6 +63,9 @@ public class StopActivity extends AppCompatActivity
     orderByTime = sharedPreferences.getBoolean(ORDER_BY_TIME_PREF, true);
 
     dbHelper = new DBHelper(this);
+
+    // Variable that indicates to not update listview after clicking save option
+    savingSchedule = false;
   }
 
   @Override
@@ -129,6 +133,9 @@ public class StopActivity extends AppCompatActivity
                   + MapsActivity.JSON_APPEND + "?"
                   + "end=" + endDate + "&"
                   + MapsActivity.API_KEY;
+
+          // Flag to not allow the update of the controls
+          savingSchedule = true;
 
           processRequest();
         }
@@ -323,7 +330,9 @@ public class StopActivity extends AppCompatActivity
           }
         }
 
+        // Recover default values
         requestUrl = defaultRequestUrl;
+        savingSchedule = false;
       }
       else
       {
@@ -365,13 +374,9 @@ public class StopActivity extends AppCompatActivity
   // Get the information from the stop schedule request
   private void parseStopSchedule(JSONObject object) throws JSONException
   {
-    TextView tvStop = findViewById(R.id.tvStop);
-
     // Get Stop Information
     stop = Helper.extractStopInfo(object.getJSONObject("stop"));
-
     String text = "Stop " + stop.number + " " + stop.name;
-    tvStop.setText(text);
 
     // Get route schedules
     JSONArray routeSchedulesArray = object.getJSONArray("route-schedules");
@@ -395,7 +400,13 @@ public class StopActivity extends AppCompatActivity
       }
     }
 
-    setRoutesListView();
+    // Do not update controls after clicking the save option
+    if (!savingSchedule)
+    {
+      TextView tvStop = findViewById(R.id.tvStop);
+      tvStop.setText(text);
+      setRoutesListView();
+    }
   }
 
   // Custom ArrayAdapter for our ListView
