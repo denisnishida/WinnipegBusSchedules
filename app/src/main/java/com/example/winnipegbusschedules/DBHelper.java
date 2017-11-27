@@ -291,7 +291,7 @@ public class DBHelper extends SQLiteOpenHelper
   public void deleteOldRoutes()
   {
     // Get current time
-    String current_time = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss", Locale.CANADA).format(new Date());
+    String current_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(new Date());
     //Log.d("Testing", current_time);
 
     //get an instance of a writable database

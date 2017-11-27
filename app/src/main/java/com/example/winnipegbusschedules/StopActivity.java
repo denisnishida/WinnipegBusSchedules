@@ -30,9 +30,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 
 public class StopActivity extends AppCompatActivity
 {
@@ -103,6 +107,26 @@ public class StopActivity extends AppCompatActivity
         if (Helper.isNetworkAvailable(this))
         {
           Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
+
+          Date dt = new Date();
+          Calendar c = Calendar.getInstance();
+          c.setTime(dt);
+          c.add(Calendar.DATE, 1);
+          dt = c.getTime();
+          String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(dt);
+          endDate = endDate.replace(' ', 'T');
+
+          requestUrl = MapsActivity.BEGIN_URL
+                  + MapsActivity.STOP_SCHEDULE_REQUEST_BEGIN
+                  + "/" + clickedStopNumber
+                  + MapsActivity.STOP_SCHEDULE_REQUEST_END
+                  + MapsActivity.JSON_APPEND + "?"
+                  + "end=" + endDate + "&"
+                  + MapsActivity.API_KEY;
+
+          processRequest();
+
+
           dbHelper.insertStopValues(stop.name, stop.key, stop.number,
                                     stop.latitude, stop.longitude);
 
@@ -404,7 +428,8 @@ public class StopActivity extends AppCompatActivity
         if (tvTimes != null)
         {
           String text = "Scheduled: " + Helper.extractHourMinute(o.scheduledTime)
-                        + " | Estimated: " + Helper.extractHourMinute(o.estimatedTime);
+                        + " | Estimated: " + Helper.extractHourMinute(o.estimatedTime)
+                        + " | Date: " + Helper.extractDate(o.estimatedTime);
           tvTimes.setText(text);
           //bt.setTypeface(typeface, typefaceStyle);
         }

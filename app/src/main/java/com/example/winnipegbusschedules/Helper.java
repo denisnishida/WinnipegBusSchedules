@@ -35,6 +35,13 @@ public class Helper
     return auxTime[0] + ":" + auxTime[1];
   }
 
+  public static String extractDate(String dateTime)
+  {
+    String[] aux = dateTime.split("T");
+
+    return aux[0];
+  }
+
   public static Transit.Stop extractStopInfo(JSONObject stopObj) throws JSONException
   {
     Transit transit = new Transit();
