@@ -230,7 +230,7 @@ public class StopActivity extends AppCompatActivity
       String current_time = new SimpleDateFormat("HH:mm", Locale.CANADA).format(new Date());
 
       tvStatus.setText("Updated at " + current_time + " - Showing next 2 hour schedule");
-      tvStatus.setTextColor(Color.argb(255, 50,205,50));
+      tvStatus.setTextColor(Color.argb(255, 15,130,15));
 
       // create and execute AsyncTask
       ProcessingTask task = new ProcessingTask();

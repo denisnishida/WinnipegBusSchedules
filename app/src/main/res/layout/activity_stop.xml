@@ -24,7 +24,8 @@
       android:layout_height="wrap_content"
       android:text="Just a second...."
       android:textAlignment="center"
-      android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"/>
+      android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
+      android:textStyle="bold"/>
 
   <ListView
       android:id="@+id/lvBuses"
