@@ -114,7 +114,8 @@ public class DBHelper extends SQLiteOpenHelper
     insertValues.put(STOP_COL_LON, lon);
 
     //insert the values into the table
-    db.insert(TABLE_STOPS, null, insertValues);
+    db.insertWithOnConflict(TABLE_STOPS, null,
+                            insertValues, SQLiteDatabase.CONFLICT_REPLACE);
 
     //close the database
     db.close();
@@ -143,7 +144,8 @@ public class DBHelper extends SQLiteOpenHelper
     insertValues.put(ROUTE_COL_STOP_ID, stopId);
 
     //insert the values into the table
-    db.insert(TABLE_ROUTES, null, insertValues);
+    db.insertWithOnConflict(TABLE_ROUTES, null,
+                            insertValues, SQLiteDatabase.CONFLICT_REPLACE);
 
     //close the database
     db.close();
@@ -289,7 +291,7 @@ public class DBHelper extends SQLiteOpenHelper
   public void deleteOldRoutes()
   {
     // Get current time
-    String current_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(new Date());
+    String current_time = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss", Locale.CANADA).format(new Date());
     //Log.d("Testing", current_time);
 
     //get an instance of a writable database
