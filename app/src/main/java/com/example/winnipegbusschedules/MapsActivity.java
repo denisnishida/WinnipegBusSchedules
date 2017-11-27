@@ -1,6 +1,7 @@
 package com.example.winnipegbusschedules;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -60,10 +61,15 @@ public class MapsActivity extends AppCompatActivity
 
   public static final String STOP_NUMBER_KEY = "StopNumber";
 
+  public static final String MAIN_PREFS = "Project Settings";
+  public static final String SHOW_ONLY_SAVED_PREF = "ShowOnlySavedPreference";
+
   private GoogleMap mMap;
   private GoogleApiClient mGoogleApiClient;
   private Location mLastLocation;
   private DBHelper dbHelper;
+  private SharedPreferences sharedPreferences;
+  private boolean showOnlySavedPref;
 
   String requestUrl;
 
@@ -89,6 +95,9 @@ public class MapsActivity extends AppCompatActivity
 
     mLastLocation = null;
 
+    sharedPreferences = getSharedPreferences(MAIN_PREFS, MODE_PRIVATE);
+    showOnlySavedPref = sharedPreferences.getBoolean(SHOW_ONLY_SAVED_PREF, false);
+
     dbHelper = new DBHelper(this);
   }
 
@@ -108,16 +117,28 @@ public class MapsActivity extends AppCompatActivity
     {
       case R.id.miShowAll:
         Toast.makeText(this, "Showing all stops...", Toast.LENGTH_SHORT).show();
-        // TO DO
+        showOnlySavedPref = false;
+        requestStopsNearby(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         break;
 
       case R.id.miShowSaved:
         Toast.makeText(this, "Showing only saved stops...", Toast.LENGTH_SHORT).show();
-        // TO DO
+        showOnlySavedPref = true;
+        createMarkers();
         break;
     }
 
     return true;
+  }
+
+  @Override
+  protected void onPause()
+  {
+    super.onPause();
+
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putBoolean(SHOW_ONLY_SAVED_PREF, showOnlySavedPref);
+    editor.apply();
   }
 
   /**
@@ -146,26 +167,32 @@ public class MapsActivity extends AppCompatActivity
               {android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
 
-
-    if (!Helper.isNetworkAvailable(this))
+    if (!Helper.isNetworkAvailable(this) || showOnlySavedPref)
     {
-      ArrayList<Transit.Stop> stopsArray = dbHelper.loadDataStops();
+      createMarkers();
+    }
+  }
 
-      for (int i = 0; i < stopsArray.size(); i++)
-      {
-        String snippet = stopsArray.get(i).name;
-        String title = "Stop Number: " + stopsArray.get(i).number;
-        double latitude = stopsArray.get(i).latitude;
-        double longitude = stopsArray.get(i).longitude;
+  private void createMarkers()
+  {
+    mMap.clear();
 
-        // Add a marker in each bus stop
-        LatLng busStop = new LatLng(latitude, longitude);
-        mMap.addMarker(new MarkerOptions()
-                .position(busStop)
-                .title(title)
-                .snippet(snippet)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-      }
+    ArrayList<Transit.Stop> stopsArray = dbHelper.loadDataStops();
+
+    for (int i = 0; i < stopsArray.size(); i++)
+    {
+      String snippet = stopsArray.get(i).name;
+      String title = "Stop Number: " + stopsArray.get(i).number;
+      double latitude = stopsArray.get(i).latitude;
+      double longitude = stopsArray.get(i).longitude;
+
+      // Add a marker in each bus stop
+      LatLng busStop = new LatLng(latitude, longitude);
+      mMap.addMarker(new MarkerOptions()
+              .position(busStop)
+              .title(title)
+              .snippet(snippet)
+              .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
     }
   }
 
@@ -208,22 +235,21 @@ public class MapsActivity extends AppCompatActivity
     if (mLastLocation.distanceTo(newLocation) > 300)
     {
       mLastLocation = newLocation;
-
-      if (Helper.isNetworkAvailable(this))
-      {
-        requestStopsNearby(lat, lon);
-      }
+      requestStopsNearby(lat, lon);
     }
   }
 
   private void requestStopsNearby(double lat, double lon)
   {
-    // URL to request the stops
-    // ttp://api.winnipegtransit.com/v2/stops.json?distance=500&lat=49.895&lon=-97.138&api-key=rQ8lXW4lpLR9CwiYqK
-    requestUrl = BEGIN_URL + STOP_SCHEDULE_REQUEST_BEGIN + JSON_APPEND
-            + "?distance=500" + "&lat=" + lat + "&lon=" + lon + "&" + API_KEY;
+    if (Helper.isNetworkAvailable(this) && !showOnlySavedPref)
+    {
+      // URL to request the stops
+      // ttp://api.winnipegtransit.com/v2/stops.json?distance=500&lat=49.895&lon=-97.138&api-key=rQ8lXW4lpLR9CwiYqK
+      requestUrl = BEGIN_URL + STOP_SCHEDULE_REQUEST_BEGIN + JSON_APPEND
+              + "?distance=500" + "&lat=" + lat + "&lon=" + lon + "&" + API_KEY;
 
-    processRequest();
+      processRequest();
+    }
   }
 
   // Event Handler when the location button is clicked

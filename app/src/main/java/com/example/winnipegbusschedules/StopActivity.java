@@ -57,13 +57,14 @@ public class StopActivity extends AppCompatActivity
     orderByTime = sharedPreferences.getBoolean(ORDER_BY_TIME_PREF, true);
 
     dbHelper = new DBHelper(this);
-
   }
 
   @Override
   protected void onStart()
   {
     super.onStart();
+
+    dbHelper.deleteOldRoutes();
 
     // Get the stop number in the intent
     Intent intent = getIntent();
@@ -138,10 +139,10 @@ public class StopActivity extends AppCompatActivity
         setRoutesListView();
         break;
 
-      case R.id.miTest:
-        Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
-        dbHelper.deleteOldRoutes();
-        break;
+//      case R.id.miTest:
+//        Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
+//        dbHelper.deleteOldRoutes();
+//        break;
     }
 
     return true;

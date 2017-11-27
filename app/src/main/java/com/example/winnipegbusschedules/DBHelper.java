@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class DBHelper extends SQLiteOpenHelper
   private static final String ROUTE_COL_STOP_ID = "stop_id";
 
   //Define the database version
-  private static final int DB_VERSION = 4;
+  private static final int DB_VERSION = 5;
 
   //Define your create statement in typical sql format
   //CREATE TABLE {Tablename} (
@@ -261,9 +260,9 @@ public class DBHelper extends SQLiteOpenHelper
       bus.variantName = c.getString(0);
       bus.number = c.getString(1);
       bus.scheduledTime = c.getString(2);
-      Log.d("Testing", "scheduled: " + c.getString(2));
+      //Log.d("Testing", "scheduled: " + c.getString(2));
       bus.estimatedTime = c.getString(3);
-      Log.d("Testing", "estimated: " + c.getString(3));
+      //Log.d("Testing", "estimated: " + c.getString(3));
 
       routeArrayList.add(bus);
 
@@ -291,7 +290,7 @@ public class DBHelper extends SQLiteOpenHelper
   {
     // Get current time
     String current_time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(new Date());
-    Log.d("Testing", current_time);
+    //Log.d("Testing", current_time);
 
     //get an instance of a writable database
     SQLiteDatabase db = this.getWritableDatabase();
@@ -300,6 +299,6 @@ public class DBHelper extends SQLiteOpenHelper
                           "Datetime(" + ROUTE_COL_ESTIMATED_TIME + ") < Datetime('" + current_time + "')",
                           null);
 
-    Log.d("Testing", "Delete result: " + result);
+    //Log.d("Testing", "Delete result: " + result);
   }
 }

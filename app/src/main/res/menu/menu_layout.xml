@@ -23,7 +23,7 @@
   <item
       android:id="@+id/miOrderByRoute"
       android:title="Order by Route"/>
-  <item
-      android:id="@+id/miTest"
-      android:title="Clean old schedules"/>
+  <!--<item-->
+      <!--android:id="@+id/miTest"-->
+      <!--android:title="Clean old schedules"/>-->
 </menu>
