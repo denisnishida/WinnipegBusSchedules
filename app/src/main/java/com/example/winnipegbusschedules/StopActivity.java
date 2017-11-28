@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +57,8 @@ public class StopActivity extends AppCompatActivity
   private DBHelper dbHelper;
   private SharedPreferences sharedPreferences;
 
+  private ProgressBar progressBar;
+
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
@@ -69,6 +72,8 @@ public class StopActivity extends AppCompatActivity
 
     // Variable that indicates to not update listview after clicking save option
     savingSchedule = false;
+
+    progressBar = findViewById(R.id.progressBar2);
   }
 
   @Override
@@ -255,6 +260,8 @@ public class StopActivity extends AppCompatActivity
 
     ListView lvBuses = findViewById(R.id.lvBuses);
     lvBuses.setAdapter(feedAdapter);
+
+    progressBar.setVisibility(View.GONE);
   }
 
   @Override
@@ -270,6 +277,8 @@ public class StopActivity extends AppCompatActivity
   public void processRequest()
   {
     TextView tvStatus = findViewById(R.id.tvStatus);
+
+    progressBar.setVisibility(View.VISIBLE);
 
     if (Helper.isNetworkAvailable(this))
     {
@@ -465,6 +474,10 @@ public class StopActivity extends AppCompatActivity
       TextView tvStop = findViewById(R.id.tvStop);
       tvStop.setText(text);
       setRoutesListView();
+    }
+    else
+    {
+      progressBar.setVisibility(View.GONE);
     }
   }
 

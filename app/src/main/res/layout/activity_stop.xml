@@ -27,6 +27,15 @@
       android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
       android:textStyle="bold"/>
 
+  <ProgressBar
+      android:id="@+id/progressBar2"
+      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:indeterminate="true"
+      android:indeterminateTint="@android:color/holo_blue_dark"
+      android:visibility="visible"/>
+
   <ListView
       android:id="@+id/lvBuses"
       style="@android:style/Widget.Holo.Light.ListView"
