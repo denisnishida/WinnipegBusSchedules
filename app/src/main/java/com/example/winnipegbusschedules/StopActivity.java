@@ -296,11 +296,7 @@ public class StopActivity extends AppCompatActivity
       tvStop.setText(text);
 
       busItems = dbHelper.loadDataRoutes(clickedStopNumber);
-      // create the adapter to populate the list view
-      FeedAdapter feedAdapter = new FeedAdapter(StopActivity.this, R.layout.routes_list_item, busItems);
-
-      ListView lvBuses = findViewById(R.id.lvBuses);
-      lvBuses.setAdapter(feedAdapter);
+      setRoutesListView();
 
       isSaved = true;
       switchSaveMenuIcon();
