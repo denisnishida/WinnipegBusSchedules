@@ -11,18 +11,23 @@
       android:id="@+id/miSave"
       android:icon="@android:drawable/ic_menu_save"
       android:title="Save"
+      android:visible="true"
       app:showAsAction="always"/>
   <item
       android:id="@+id/miDelete"
-      android:icon="@android:drawable/ic_delete"
+      android:icon="@android:drawable/ic_menu_delete"
       android:title="Delete Stop"
-      app:showAsAction="ifRoom"/>
+      android:visible="true"
+      app:showAsAction="always"/>
   <item
       android:id="@+id/miOrderByTime"
       android:title="Order by Time"/>
   <item
       android:id="@+id/miOrderByRoute"
       android:title="Order by Route"/>
+  <item
+      android:id="@+id/miDaySchedule"
+      android:title="Show 1 day Schedule"/>
   <!--<item-->
       <!--android:id="@+id/miTest"-->
       <!--android:title="Clean old schedules"/>-->

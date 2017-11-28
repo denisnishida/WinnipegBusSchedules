@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +47,7 @@ public class StopActivity extends AppCompatActivity
 
   private boolean orderByTime;
   private boolean savingSchedule;
+  private boolean isSaved;
   private String requestUrl;
   private String defaultRequestUrl;
   private String clickedStopNumber;
@@ -116,6 +118,8 @@ public class StopActivity extends AppCompatActivity
         {
           Toast.makeText(this, "Saving Stop for offline use...", Toast.LENGTH_SHORT).show();
 
+          isSaved = true;
+
           dbHelper.insertStopValues(stop.name, stop.key, stop.number,
                   stop.latitude, stop.longitude);
 
@@ -148,10 +152,10 @@ public class StopActivity extends AppCompatActivity
         break;
 
       case R.id.miDelete:
-
         Toast.makeText(this, "Deleting Stop for offline use...", Toast.LENGTH_SHORT).show();
         dbHelper.deleteStop(clickedStopNumber);
-
+        isSaved = false;
+        switchSaveMenuIcon();
         break;
 
       case R.id.miOrderByTime:
@@ -166,6 +170,28 @@ public class StopActivity extends AppCompatActivity
         setRoutesListView();
         break;
 
+      case R.id.miDaySchedule:
+        Toast.makeText(this, "Retrieving one day schedule...", Toast.LENGTH_SHORT).show();
+
+        Date dt = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.DATE, 1);
+        dt = c.getTime();
+        String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA).format(dt);
+        endDate = endDate.replace(' ', 'T');
+
+        requestUrl = MapsActivity.BEGIN_URL
+                + MapsActivity.STOP_SCHEDULE_REQUEST_BEGIN
+                + "/" + clickedStopNumber
+                + MapsActivity.STOP_SCHEDULE_REQUEST_END
+                + MapsActivity.JSON_APPEND + "?"
+                + "end=" + endDate + "&"
+                + MapsActivity.API_KEY;
+
+        processRequest();
+        break;
+
 //      case R.id.miTest:
 //        Toast.makeText(this, "Ordering by Route...", Toast.LENGTH_SHORT).show();
 //        dbHelper.deleteOldRoutes();
@@ -173,6 +199,27 @@ public class StopActivity extends AppCompatActivity
     }
 
     return true;
+  }
+
+  // Switch the save and delete icons
+  private void switchSaveMenuIcon()
+  {
+    ActionMenuItemView miSave = findViewById(R.id.miSave);
+    ActionMenuItemView miDelete = findViewById(R.id.miDelete);
+
+    if (miSave != null && miDelete != null)
+    {
+      if (isSaved)
+      {
+        miSave.setVisibility(View.GONE);
+        miDelete.setVisibility(View.VISIBLE);
+      }
+      else
+      {
+        miDelete.setVisibility(View.GONE);
+        miSave.setVisibility(View.VISIBLE);
+      }
+    }
   }
 
   private void setRoutesListView()
@@ -254,6 +301,9 @@ public class StopActivity extends AppCompatActivity
 
       ListView lvBuses = findViewById(R.id.lvBuses);
       lvBuses.setAdapter(feedAdapter);
+
+      isSaved = true;
+      switchSaveMenuIcon();
     }
   }
 
@@ -329,8 +379,10 @@ public class StopActivity extends AppCompatActivity
         parseJSON(response);
 
         // Checking if this stop is saved in the database
-        Transit.Stop tempStop = dbHelper.loadDataStop(stop.number);
-        if (tempStop != null)
+        isSaved = Helper.isSaved(StopActivity.this, stop.key);
+        switchSaveMenuIcon();
+
+        if (isSaved)
         {
           // Store the schedules
           for (int i = 0; i < busItems.size(); i++)

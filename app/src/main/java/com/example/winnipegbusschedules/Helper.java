@@ -77,4 +77,20 @@ public class Helper
 
     return busItem;
   }
+
+  // Checks if the stop is saved in the database
+  public static boolean isSaved(Context context, String stopKey)
+  {
+    boolean result = false;
+
+    DBHelper dbHelper = new DBHelper(context);
+    Transit.Stop tempStop = dbHelper.loadDataStop(stopKey);
+
+    if (tempStop != null)
+    {
+      result = true;
+    }
+
+    return result;
+  }
 }
