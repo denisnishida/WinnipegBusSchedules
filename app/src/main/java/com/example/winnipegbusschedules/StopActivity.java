@@ -160,7 +160,7 @@ public class StopActivity extends AppCompatActivity
         Toast.makeText(this, "Deleting Stop for offline use...", Toast.LENGTH_SHORT).show();
         dbHelper.deleteStop(clickedStopNumber);
         isSaved = false;
-        switchSaveMenuIcon();
+//        switchSaveMenuIcon();
         break;
 
       case R.id.miOrderByTime:
@@ -308,7 +308,7 @@ public class StopActivity extends AppCompatActivity
       setRoutesListView();
 
       isSaved = true;
-      switchSaveMenuIcon();
+//      switchSaveMenuIcon();
     }
   }
 
@@ -385,7 +385,7 @@ public class StopActivity extends AppCompatActivity
 
         // Checking if this stop is saved in the database
         isSaved = Helper.isSaved(StopActivity.this, stop.key);
-        switchSaveMenuIcon();
+//        switchSaveMenuIcon();
 
         if (isSaved)
         {
